@@ -22,7 +22,9 @@ Free and open source under the [MIT license](LICENSE). Requires **macOS 14 or ne
 3. Launch the app. It lives in the macOS menu bar.
 4. Click **Enable screen recording** and allow Back to Bug in **System Settings → Privacy & Security → Screen Recording** (called **Screen & System Audio Recording** on newer macOS versions). Restart the app if macOS asks.
 
-**Current releases are ad-hoc signed and are not notarized by Apple.** If macOS blocks the first launch, use **System Settings → Privacy & Security → Open Anyway** after attempting to open it. Only do this for a download you trust. SHA-256 checksum files are included with each release.
+**Releases from v0.1.2 onward are signed with Developer ID and notarized by Apple.** macOS may still ask you to confirm the first launch and grant Screen Recording permission. SHA-256 checksum files are included with each release.
+
+Older releases and local builds without a Developer ID are ad-hoc signed. If macOS blocks one of these builds, use **System Settings → Privacy & Security → Open Anyway** after attempting to open it. Only do this for a build you trust.
 
 ## Use it while testing
 
@@ -60,7 +62,7 @@ The app is currently **macOS only**.
 
 **Screen access is enabled, but recording still fails**
 
-Quit and reopen Back to Bug after granting permission. If the problem starts after replacing or rebuilding the app, remove its old entry from Screen Recording settings, add the current app from Applications, and reopen it. Ad-hoc builds can have different code signatures, so macOS may require permission again.
+Quit and reopen Back to Bug after granting permission. When switching from an older ad-hoc release or a local build, macOS may require permission again because the signing identity changes. If recording still fails, remove the old Back to Bug entry from Screen Recording settings, add the current app from Applications, and reopen it.
 
 **The shortcut does not save a replay**
 
@@ -94,6 +96,8 @@ bash scripts/build.sh
 
 Without those values, the script creates an ad-hoc signed local build.
 
+Tagged GitHub releases require the Actions secrets `APPLE_CERTIFICATE_BASE64` (a Base64-encoded Developer ID PKCS12 file), `APPLE_CERTIFICATE_PASSWORD`, `APPLE_ID`, and `APPLE_APP_SPECIFIC_PASSWORD`, plus the repository variables `APPLE_TEAM_ID` and `APPLE_SIGNING_IDENTITY`. Branch and pull request builds use ad-hoc signing. A tagged release is published only after notarization and Gatekeeper verification succeed.
+
 ### How it works
 
 ScreenCaptureKit captures the selected display. VideoToolbox encodes frames as H.264, and a rolling buffer retains recent encoded frames. Saving takes a snapshot of that buffer and writes an MP4 through AVFoundation.
@@ -104,7 +108,7 @@ ScreenCaptureKit captures the selected display. VideoToolbox encodes frames as H
 | `Sources/ReplayCore` | Video encoding, rolling buffer, and MP4 export |
 | `Tests/ReplayCoreTests` | Buffer retention, memory limits, and encode/export tests |
 | `scripts/build.sh` | Universal app, signing, DMG, and checksums |
-| `.github/workflows/build.yml` | Tests and builds for pushes and PRs; releases for version tags |
+| `.github/workflows/build.yml` | Tests and builds for pushes and PRs; notarized releases for version tags |
 
 ## Contributing
 

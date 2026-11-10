@@ -160,7 +160,7 @@ struct PanelView: View {
           Label("Settings", systemImage: "gearshape").frame(maxWidth: .infinity)
         }.disabled(model.isBusy)
         Text(
-          "v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.1")"
+          "v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.2")"
         )
         .font(.system(size: 10)).foregroundStyle(.secondary)
         Button {

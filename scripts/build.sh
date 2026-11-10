@@ -2,9 +2,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-VERSION="${VERSION:-0.1.1}"
+VERSION="${VERSION:-0.1.2}"
 if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "VERSION must be a semantic version such as 0.1.0" >&2
+    exit 1
+fi
+if [[ -n "${NOTARY_PROFILE:-}" && -z "${SIGNING_IDENTITY:-}" ]]; then
+    echo "SIGNING_IDENTITY is required for notarization" >&2
     exit 1
 fi
 APP="dist/Back to Bug.app"
@@ -15,6 +19,7 @@ cp "$BIN_PATH/BackToBug" "$APP/Contents/MacOS/BackToBug"
 lipo "$APP/Contents/MacOS/BackToBug" -verify_arch arm64
 lipo "$APP/Contents/MacOS/BackToBug" -verify_arch x86_64
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+cp LICENSE "$APP/Contents/Resources/LICENSE"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${BUILD_NUMBER:-1}" "$APP/Contents/Info.plist"
 swift scripts/make-icon.swift .build/AppIcon.iconset
@@ -34,9 +39,15 @@ ln -s /Applications "$STAGING/Applications"
 DMG="dist/BackToBug-${VERSION}-universal.dmg"
 rm -f "$DMG"
 hdiutil create -volname "Back to Bug" -srcfolder "$STAGING" -ov -format UDZO "$DMG"
+if [[ -n "${SIGNING_IDENTITY:-}" ]]; then
+    codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$DMG"
+    codesign --verify --strict "$DMG"
+fi
 if [[ -n "${NOTARY_PROFILE:-}" ]]; then
-    xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait --timeout 10m
+    xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait --timeout 1h
     xcrun stapler staple "$DMG"
+    xcrun stapler validate "$DMG"
+    spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG"
 fi
 (cd dist && shasum -a 256 "$(basename "$DMG")") > "$DMG.sha256"
 echo "Built $DMG"
