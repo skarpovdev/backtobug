@@ -38,5 +38,5 @@ if [[ -n "${NOTARY_PROFILE:-}" ]]; then
     xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait --timeout 10m
     xcrun stapler staple "$DMG"
 fi
-shasum -a 256 "$DMG" > "$DMG.sha256"
+(cd dist && shasum -a 256 "$(basename "$DMG")") > "$DMG.sha256"
 echo "Built $DMG"

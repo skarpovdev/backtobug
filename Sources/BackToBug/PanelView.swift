@@ -3,6 +3,7 @@ import SwiftUI
 
 private enum Theme {
   static let accent = Color(red: 0.19, green: 0.34, blue: 0.94)
+  static let link = Color(nsColor: .linkColor)
   static let success = Color(nsColor: .systemGreen)
   static let card = Color(nsColor: .controlBackgroundColor)
   static let border = Color.primary.opacity(0.08)
@@ -111,7 +112,7 @@ struct PanelView: View {
             Spacer()
             Button("Open folder", action: model.openFolder).font(.system(size: 11)).buttonStyle(
               .plain
-            ).foregroundStyle(Theme.accent)
+            ).foregroundStyle(Theme.link)
           }
           VStack(spacing: 2) {
             if model.clips.isEmpty {
@@ -131,7 +132,7 @@ struct PanelView: View {
                   } label: {
                     HStack(spacing: 10) {
                       Image(systemName: "play.rectangle.fill").font(.system(size: 22))
-                        .foregroundStyle(Theme.accent.opacity(0.8))
+                        .foregroundStyle(Theme.link)
                         .frame(width: 38, height: 34).background(
                           Theme.accent.opacity(0.08), in: RoundedRectangle(cornerRadius: 7))
                       VStack(alignment: .leading, spacing: 3) {
@@ -169,7 +170,7 @@ struct PanelView: View {
         Text(
           "v\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.0")"
         )
-        .font(.system(size: 10)).foregroundStyle(.tertiary)
+        .font(.system(size: 10)).foregroundStyle(.secondary)
         Spacer()
         Button {
           NSApp.terminate(nil)
@@ -199,10 +200,10 @@ struct PanelView: View {
         ).monospacedDigit()
         Text("/ \(clock(Double(model.settings.duration)))").font(
           .system(size: 17, weight: .medium, design: .rounded)
-        ).foregroundStyle(.tertiary)
+        ).foregroundStyle(.secondary)
         Spacer()
         Image(systemName: "arrow.counterclockwise").font(.system(size: 30, weight: .light))
-          .foregroundStyle(Theme.accent)
+          .foregroundStyle(Theme.link)
           .accessibilityHidden(true)
       }
       HStack(spacing: 3) {
@@ -245,7 +246,7 @@ struct PanelView: View {
   private var permissionCard: some View {
     VStack(alignment: .leading, spacing: 12) {
       Image(systemName: "display.badge.checkmark").font(.system(size: 27)).foregroundStyle(
-        Theme.accent)
+        Theme.link)
       Text("Be ready for the next bug.").font(.system(size: 19, weight: .semibold))
       Text(
         "Allow screen recording to keep a rolling replay. Video stays on this Mac and is saved only when you choose."
@@ -258,7 +259,7 @@ struct PanelView: View {
         Text("Enable screen recording").frame(maxWidth: .infinity).frame(height: 30)
       }.buttonStyle(.borderedProminent).controlSize(.large)
       Button("Open System Settings", action: model.openPermissions).font(.system(size: 11))
-        .buttonStyle(.plain).foregroundStyle(Theme.accent)
+        .buttonStyle(.plain).foregroundStyle(Theme.link)
     }.padding(16).card()
   }
 
@@ -372,7 +373,7 @@ struct SettingsView: View {
               .secondary)
             Divider()
             HStack {
-              Image(systemName: "folder").foregroundStyle(Theme.accent)
+              Image(systemName: "folder").foregroundStyle(Theme.link)
               Text(URL(fileURLWithPath: draft.folderPath).lastPathComponent).lineLimit(1)
                 .truncationMode(.middle)
               Spacer()
