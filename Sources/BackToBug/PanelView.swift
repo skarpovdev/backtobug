@@ -80,13 +80,6 @@ struct PanelView: View {
                 .font(.system(size: 10)).foregroundStyle(.secondary)
               }
               Spacer()
-              Button {
-                showsSettings = true
-              } label: {
-                Image(systemName: "slider.horizontal.3")
-              }
-              .buttonStyle(.plain).help("Capture settings").accessibilityLabel("Capture settings")
-              .disabled(model.isBusy)
             }.padding(13)
             Divider().padding(.horizontal, 13)
             Button(action: model.toggleRecording) {
